@@ -2,6 +2,7 @@ import json
 import os
 
 from playwright.sync_api import sync_playwright
+import pytest
 from pytest import fixture
 
 from page_objects.application import App
@@ -14,13 +15,38 @@ def get_playwright():
         yield playwright
 
 
+@fixture(scope='session', params=['chromium', 'firefox', 'webkit'], ids=['chromium', 'firefox', 'webkit'])
+def get_browser(get_playwright, request):
+    #browser = request.config.getoption('--browser')
+    browser = request.param
+    os.environ['PWBROWSER'] = browser
+    headless = request.config.getini('headless')
+    if headless == 'True':
+        headless = True
+    else:
+        headless = False
+
+    if browser == 'chromium':
+        bro = get_playwright.chromium.launch(headless=headless)
+    elif browser == 'firefox':
+        bro = get_playwright.firefox.launch(headless=headless)
+    elif browser == 'webkit':
+        bro = get_playwright.webkit.launch(headless=headless)
+    else:
+        assert False, 'Unsupported browser type'
+    yield bro
+    bro.close()
+    del os.environ['PWBROWSER']
+
+
+
 @fixture(scope='session')
-def desktop_app(get_playwright, request):
+def desktop_app(get_playwright, get_browser, request):
     #app = App(get_playwright, base_url=settings.BASE_URL)
     base_url = request.config.getoption('--base-url')
     #base_url = request.config.getini('base-url')
     #app = App(get_playwright, base_url=base_url)
-    app = App(get_playwright, base_url=base_url, **settings.BROWSER_OPTIONS)
+    app = App(get_browser, base_url=base_url, **settings.BROWSER_OPTIONS)
     app.goto('/')
     yield app
     app.close()
@@ -38,11 +64,22 @@ def desktop_app_auth(desktop_app, request):
     yield app
 
 
-@fixture(scope='session')
-def mobile_app(get_playwright, request):
+@fixture(scope='session', params=['iPhone 11', 'Pixel 2'])
+def mobile_app(get_playwright, get_browser, request):
+    if os.environ.get('PWBROWSER') == 'firefox':
+        pytest.skip('FireFox is not supported for Mobile')
+
     base_url = request.config.getoption('--base-url')
-    device = request.config.getoption('--device')
-    app = App(get_playwright, base_url=base_url, device=device, **settings.BROWSER_OPTIONS)
+    #device = request.config.getoption('--device')
+    device = request.param
+
+    device_config = get_playwright.devices.get(device)
+    if device_config is not None:
+        device_config.update(settings.BROWSER_OPTIONS)
+    else:
+        device_config = settings.BROWSER_OPTIONS
+
+    app = App(get_browser, base_url=base_url, **device_config)
     app.goto('/')
     yield app
     app.close()
@@ -63,6 +100,8 @@ def pytest_addoption(parser):
     #parser.addini('base-url', help='base url for site under test', default='http://127.0.0.1:8000')
     parser.addoption('--secure', action='store', default='secure.json')
     parser.addoption('--device', action='store', default='')
+    parser.addoption('--browser', help='browser to run', default='chromium')
+    parser.addini('headless', help='run browser in headless mode', default='True')
 
 
 # request.session.fspath.strpath - path to project root

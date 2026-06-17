@@ -1,22 +1,13 @@
-from playwright.sync_api import Playwright
+from playwright.sync_api import Browser
 
 from page_objects.test_cases import TestCases
 
 
 class App:
 
-    def __init__(self, playwright: Playwright, base_url, headless=False, device=None, **kwargs):
-        device_config = playwright.devices.get(device)
-        if device_config is not None:
-            device_config.update(kwargs)
-        else:
-            device_config = kwargs
-        self.browser = playwright.chromium.launch(headless=headless)
-        # self.context = self.browser.new_context(
-        #     geolocation={"longitude": 41.890221, "latitude": 12.492348},
-        #     permissions=["geolocation"]
-        # )
-        self.context = self.browser.new_context(**device_config)
+    def __init__(self, browser: Browser, base_url, **kwargs):
+        self.browser = browser
+        self.context = self.browser.new_context(**kwargs)
         self.page = self.context.new_page()
         self.base_url = base_url
         self.test_cases = TestCases(self.page)
@@ -29,6 +20,7 @@ class App:
 
     def navigate_to_menu(self, menu):
         self.page.get_by_role("link", name=menu).click()
+        self.page.wait_for_load_state()
 
     def login(self, login: str, password: str):
         self.page.get_by_role("textbox", name="Username:").fill(login)
@@ -52,4 +44,3 @@ class App:
     def close(self):
         self.page.close()
         self.context.close()
-        self.browser.close()
