@@ -5,12 +5,13 @@ from page_objects.test_cases import TestCases
 
 class App:
 
-    def __init__(self, playwright: Playwright, base_url, headless=False):
+    def __init__(self, playwright: Playwright, base_url, headless=False, **kwargs):
         self.browser = playwright.chromium.launch(headless=headless)
-        self.context = self.browser.new_context(
-            geolocation={"longitude": 41.890221, "latitude": 12.492348},
-            permissions=["geolocation"]
-        )
+        # self.context = self.browser.new_context(
+        #     geolocation={"longitude": 41.890221, "latitude": 12.492348},
+        #     permissions=["geolocation"]
+        # )
+        self.context = self.browser.new_context(**kwargs)
         self.page = self.context.new_page()
         self.base_url = base_url
         self.test_cases = TestCases(self.page)

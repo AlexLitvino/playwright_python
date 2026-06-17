@@ -247,7 +247,7 @@ Test methods could be combined into class if tests use common variables or metho
 
 Don't make tests dependent one from another!
 If you need some pre-condition - move it to fixture.
-Think is it possible to sett app state manipulating by web services or DB.
+Think is it possible to set app state manipulating by web services or DB.
 Ficture parameter autouse=True - when we don't need to pass fixture value to test functions but need this fixture is performed before tests.
 
 
@@ -267,6 +267,8 @@ def desktop_app(get_playwright, request):
     base_url = request.config.getini('base_url')
 ```
 4. Using config file (.json)
+
+
 
 base-url better pass via command line options.
 Keeping usernames and passwords in files is bad idea:
