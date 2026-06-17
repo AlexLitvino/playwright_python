@@ -11,3 +11,9 @@ class TestCases:
 
     def delete_test_by_name(self, test_name: str):
         self.page.locator(f'//td[text()="{test_name}"]/../*[@class="ttRemBtn"]/button').click()
+
+    def check_columns_hidden(self):
+        description = self.page.is_hidden('.thDes')
+        author = self.page.is_hidden('.thAuthor')
+        executor = self.page.is_hidden('.thLast')
+        return description and author and executor
