@@ -11,6 +11,7 @@ class TestCases:
 
     def delete_test_by_name(self, test_name: str):
         self.page.locator(f'//td[text()="{test_name}"]/../*[@class="ttRemBtn"]/button').click()
+        self.page.wait_for_timeout(300)  # added because removing test case has animation
 
     def check_columns_hidden(self):
         description = self.page.is_hidden('.thDes')

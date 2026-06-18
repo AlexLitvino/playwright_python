@@ -5,8 +5,20 @@ from playwright.sync_api import sync_playwright
 import pytest
 from pytest import fixture
 
+from helpers.web_service import WebService
 from page_objects.application import App
 import settings
+
+
+@pytest.fixture(scope='session')
+def get_web_service(request):
+    base_url = request.config.getoption('--base-url')
+    secure = request.config.getoption('--secure')
+    config = load_config(secure)
+    web = WebService(base_url)
+    web.login(**config)
+    yield web
+    web.close()
 
 
 @fixture(scope='session')
