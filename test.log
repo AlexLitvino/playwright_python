@@ -1,0 +1,5 @@
+ERROR    root:application.py:22 page: http://127.0.0.1:8000/login/?next=/, console error: Failed to load resource: the server responded with a status of 404 (Not Found)
+ERROR    root:application.py:22 page: http://127.0.0.1:8000/demo/, console error: Hi! I'm the ERROR. Try to catch me
+WARNING  root:application.py:25 page: http://127.0.0.1:8000/demo/, dialog test: You have to press Ctrl button
+ERROR    root:application.py:22 page: http://127.0.0.1:8000/demo/, console error: This is injected error
+WARNING  root:application.py:25 page: http://127.0.0.1:8000/demo/, dialog test: This is injected alert
