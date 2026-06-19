@@ -12,6 +12,7 @@ def test_dashboard_data(desktop_app_auth):
 def test_multiple_roles(desktop_app_auth, desktop_app_bob, get_db):
     alice = desktop_app_auth
     bob = desktop_app_bob
+    alice.refresh_dashboard()  # TODO: not clear why need this step: initially Alice statistics shows all 0 when run with other tests
     before = alice.get_total_tests_stat()
     bob.navigate_to_menu('Create new test')
     bob.create_test('test by bob', 'bob')
