@@ -67,7 +67,7 @@ class App:
 
     def refresh_dashboard(self):
         self.page.click('input')
-        self.page.wait_for_event('response')
+        self.page.wait_for_event('response')  # added because refresh is performed to fast and need to wait for response
 
     def get_total_tests_stat(self):
         return self.page.text_content('.total >> span')
