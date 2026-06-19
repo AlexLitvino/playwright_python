@@ -25,8 +25,9 @@ class WebService:
             'csrfmiddlewaretoken': token
         }
         self.session.post(self.base_url + '/login/', data=data)
-        #csrftoken = self.session.cookies.get('csrftoken')
-        #self.session.headers.update({'X-CSRFToken': csrftoken})
+        # https://youtu.be/RBOtkYOsD-M?list=PLGE9K4YL_ywj4F7cSA4oDptnqTmyS7hZp&t=84
+        csrftoken = self.session.cookies.get('csrftoken')
+        self.session.headers.update({'X-CSRFToken': csrftoken})
 
     def create_test(self, test_name, test_description):
         token = self._get_token('/test/new')
@@ -39,7 +40,6 @@ class WebService:
 
     def report_test(self, test_id: int, status: str):
         self.session.post(self.base_url + f'/tests/{test_id}/status', json={'status': status})
-
 
     def close(self):
         self.session.close()

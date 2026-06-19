@@ -7,6 +7,7 @@ ddt = {"argnames": 'name,description',
        }
 
 
+@pytest.mark.test_id(219)
 @pytest.mark.parametrize(**ddt)
 def test_new_testcase(desktop_app_auth, name, description):
     desktop_app_auth.navigate_to_menu('Create new test')
@@ -16,11 +17,13 @@ def test_new_testcase(desktop_app_auth, name, description):
     desktop_app_auth.test_cases.delete_test_by_name(name)
 
 
+@pytest.mark.test_id(220)
 def test_testcase_does_not_exists(desktop_app_auth):
     desktop_app_auth.navigate_to_menu('Test Cases')
     assert not desktop_app_auth.test_cases.check_test_exists('Abracadabra')
 
 
+@pytest.mark.test_id(221)
 def test_delete_test_case(desktop_app_auth, get_web_service):
     test_name = 'test for deletion'
     get_web_service.create_test(test_name, 'delete me')
@@ -31,6 +34,7 @@ def test_delete_test_case(desktop_app_auth, get_web_service):
 
 
 # Test using DB
+@pytest.mark.test_id(222)
 def test_new_testcase_simple(desktop_app_auth, get_db):
     test_name = 'Hello'
     tests = get_db.list_test_cases()

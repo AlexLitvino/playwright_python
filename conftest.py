@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 
 import allure
@@ -10,6 +11,28 @@ from helpers.web_service import WebService
 from helpers.db import DataBase
 from page_objects.application import App
 import settings
+
+
+@pytest.fixture(scope='session', autouse=True)
+def preconditions(request):
+    logging.info('Preconditions started')
+
+    # copied from get_web_service fixture
+    base_url = request.config.getoption('--base-url')
+    secure = request.config.getoption('--secure')
+    config = load_config(secure)
+
+    yield
+    logging.info('Postconditions finished')
+    web = WebService(base_url)
+    web.login(**config['users']['userRole3'])
+    for test in request.node.items:
+        if len(test.own_markers) > 0:
+            if test.own_markers[0].name == 'test_id':
+                if test.result_call.passed:
+                    web.report_test(test.own_markers[0].args[0], 'PASS')
+                if test.result_call.failed:
+                    web.report_test(test.own_markers[0].args[0], 'FAIL')
 
 
 @pytest.fixture(scope='session')
