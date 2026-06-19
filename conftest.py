@@ -1,6 +1,7 @@
 import json
 import os
 
+import allure
 from playwright.sync_api import sync_playwright
 import pytest
 from pytest import fixture
@@ -127,6 +128,25 @@ def mobile_app_auth(mobile_app, request):
     app.goto('/login')
     app.login(**config["users"]["userRole1"])
     yield app
+
+
+@pytest.hookimpl(tryfirst=True, hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    outcome = yield
+    result = outcome.get_result()
+    # result.when == "setup" >> "call" >> "teardown"
+    setattr(item, f'result_{result.when}', result)
+
+
+@pytest.fixture(scope='function', autouse=True)
+def make_screenshots(request):
+    yield
+    if request.node.result_call.failed:
+        for arg in request.node.funcargs.values():
+            if isinstance(arg, App):
+                allure.attach(body=arg.page.screenshot(),
+                              name='screenshot.png',
+                              attachment_type=allure.attachment_type.PNG)
 
 
 def pytest_addoption(parser):

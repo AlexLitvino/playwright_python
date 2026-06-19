@@ -1,5 +1,6 @@
 import logging
 
+import allure
 from playwright.sync_api import Browser
 from playwright.sync_api import Request, Route, ConsoleMessage, Dialog
 
@@ -28,50 +29,62 @@ class App:
         self.page.on('console', console_handler)
         self.page.on('dialog', dialog_handler)
 
+    @allure.step
     def goto(self, endpoint: str, use_base_url=True):
         if use_base_url:
             self.page.goto(self.base_url + endpoint)
         else:
             self.page.goto(endpoint)
 
+    @allure.step
     def navigate_to_menu(self, menu):
         self.page.get_by_role("link", name=menu).click()
         self.page.wait_for_load_state()
 
+    @allure.step
     def login(self, login: str, password: str):
         self.page.get_by_role("textbox", name="Username:").fill(login)
         self.page.get_by_role("textbox", name="Password:").fill(password)
         self.page.get_by_role("button", name="Login").click()
 
+    @allure.step
     def create_test(self, test_name: str, test_description: str):
         self.page.locator("#id_name").fill(test_name)
         self.page.get_by_role("textbox", name="Test description").fill(test_description)
         self.page.get_by_role("button", name="Create").click()
 
+    @allure.step
     def click_menu_button(self):
         self.page.click('.menuBtn')
 
+    @allure.step
     def is_visible_menu_button(self):
         return self.page.is_visible('.menuBtn')
 
+    @allure.step
     def get_location(self):
         return self.page.text_content('.position')
 
+    @allure.step
     def intercept_requests(self, url: str, payload: str):
         def handler(route: Route, request: Request):
             route.fulfill(status=200, body=payload)
         self.page.route(url, handler)
 
+    @allure.step
     def stop_intercept(self, url: str):
         self.page.unroute(url)
 
+    @allure.step
     def refresh_dashboard(self):
         self.page.click('input')
         self.page.wait_for_event('response')  # added because refresh is performed to fast and need to wait for response
 
+    @allure.step
     def get_total_tests_stat(self):
         return self.page.text_content('.total >> span')
 
+    @allure.step
     def close(self):
         self.page.close()
         self.context.close()
