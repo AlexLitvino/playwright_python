@@ -6,6 +6,7 @@ import pytest
 from pytest import fixture
 
 from helpers.web_service import WebService
+from helpers.db import DataBase
 from page_objects.application import App
 import settings
 
@@ -19,6 +20,14 @@ def get_web_service(request):
     web.login(**config)
     yield web
     web.close()
+
+
+@pytest.fixture(scope='session')
+def get_db(request):
+    path = request.config.getini('db_path')
+    db = DataBase(path)
+    yield db
+    db.close()
 
 
 @fixture(scope='session')
@@ -115,6 +124,7 @@ def pytest_addoption(parser):
     parser.addoption('--device', action='store', default='')
     parser.addoption('--browser', help='browser to run', default='chromium')
     parser.addini('headless', help='run browser in headless mode', default='True')
+    parser.addini('db_path', help='path to db', default='/home/olytvynov/Projects/HL/Personal/TestMe-TCM/db.sqlite3')
 
 
 # request.session.fspath.strpath - path to project root
