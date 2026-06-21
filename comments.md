@@ -545,7 +545,7 @@ state - "attached", "detached", "hidden", "visible"
 Test module test_expect.py
 
 To expect could be passed:
-- page ()
+- page
 - locator
 - response
 
